@@ -142,178 +142,80 @@ class BasicTools:
 
 		return Mt
 	def inMixAtRound(r):
-    		#assert(r >= 1)
     		return ['x_InMC_' + str(r) + '_' + str(i) for i in range(0,16)]
 	def VarGen(s,n):
 	    return [str(s) + '_' + str(n) + '_' + str(i) for i in range(0,16)]
 	def plusTerm(in_vars):
-		"""
-		>>> BasicTools.plusTerm(['x','y','z'])
-		'x + y + z'
-		>>> BasicTools.plusTerm(['x','y'])
-		'x + y'
-		>>> BasicTools.plusTerm(['x','y','z','a','b'])
-		'x + y + z + a + b'
-		>>>
-		"""
 		t = ''
 		for v in in_vars:
 		    t = t + v + ' + '
-
 		return t[0:-3]
 
 	def MinusTerm(in_vars):
-		"""
-		>>> BasicTools.plusTerm(['x','y','z'])
-		'x + y + z'
-		>>> BasicTools.plusTerm(['x','y'])
-		'x + y'
-		>>> BasicTools.plusTerm(['x','y','z','a','b'])
-		'x + y + z + a + b'
-		>>>
-		"""
 		t = ''
 		for v in in_vars:
 		    t = t + v + ' - '
-
 		return t[0:-3]	    
 	def equalConstraints(x, y):
 		assert len(x) == len(y)
 		c = []
 		for i in range(0, len(x)):
 	    		c = c + [x[i] + ' - ' + y[i] + ' = 0']
-		return c
-		
+		return c		
 	def greaterConstraints(x, y):
 		assert len(x) == len(y)
 		c = []
 		for i in range(0, len(x)):
 	    		c = c + [x[i] + ' - ' + y[i] + ' >= 0']
-		return c
-		
+		return c		
 	def greaterConstraints_xyz(x, y, z):
 		assert len(x) == len(y)
 		c = []
 		for i in range(0, len(x)):
 	    		c = c + [x[i] + ' + ' + y[i] + ' - ' + z[i] + ' >= 0']
-		return c			    
-		
-	def transpose(M):
-		"""
-		Transpose the matrix M
-		>>> M = [[1,0,1,1],[1,0,0,0],[0,1,1,0],[1,0,1,0]]
-		>>>
-		>>> BasicTools.transpose(M)
-		[[1, 1, 0, 1], [0, 0, 1, 0], [1, 0, 1, 1], [1, 0, 0, 0]]
-		>>>
-		>>>
-		"""
-		m = len(M)
-		n = len(M[0])
-
-		Mt = []
-		for i in range(0, n):
-		    row = [M[k][i] for k in range(0, m)]
-		    Mt.append(row)
-
-		return Mt		
+		return c			    				
 	def getVariables(C):
 		V = set([])
-		#for s in C :
-		#print(s)
 		temp = C.strip()
-		#print(temp)
-		        
 		temp = temp.replace('+', ' ')
 		temp = temp.replace('-', ' ')
 		temp = temp.replace('>=', ' ')
 		temp = temp.replace('<=', ' ')
 		temp = temp.replace('=', ' ')
-		        
-		#print(temp)
 		temp = temp.split()
-		#print(temp)
 		for v in temp :
 		        if not v.isdecimal():
 		                V.add(v)
-		#print(V)
 		return V
 
-class Extension:	
-	print("Extension")	
+class Extension:		
 	def ForwardDiff_LinearLayer(M, V_in, V_out):
-		"""
-		>>> M = [[1,0,1,1],[1,0,0,0],[0,1,1,0],[1,0,1,0]]
-		>>> a = ['a0', 'a1', 'a2', 'a3']
-		>>> b = ['b0', 'b1', 'b2', 'b3']
-		>>>
-		>>> for c in MITMConstraints.ForwardDiff_LinearLayer(M, a, b): print(c)
-		...
-		3 b0 -  a0 - a2 - a3 >= 0
-		a0 + a2 + a3 - b0 >= 0
-		1 b1 -  a0 >= 0
-		a0 - b1 >= 0
-		2 b2 -  a1 - a2 >= 0
-		a1 + a2 - b2 >= 0
-		2 b3 -  a0 - a2 >= 0
-		a0 + a2 - b3 >= 0
-		>>>
-		"""
-		assert len(M[0]) == len(V_in), "The input is not compatible with the matrix"
-		assert len(M) == len(V_out), "The output is not compatible with the matrix"
-
-
+		assert len(M[0]) == len(V_in)
+		assert len(M) == len(V_out)
 		m = len(M)
 		n = len(M[0])
-
 		constr = []
 		for i in range(0, m):
 		    s = sum(M[i]) # the number of 1s in row i
 		    terms = [V_in[j] for j in range(0, n) if M[i][j] == 1]
 		    constr = constr + [str(s) + ' ' + V_out[i] + ' - ' + ' ' + BasicTools.MinusTerm(terms) + ' >= 0']
 		    constr = constr + [BasicTools.plusTerm(terms) + ' - ' + V_out[i] + ' >= 0']
-
 		return constr
 	def LinearLayer(M, V_in, V_out):
-		"""
-		>>> M = [[1,0,1,1],[1,0,0,0],[0,1,1,0],[1,0,1,0]]
-		>>> a = ['a0', 'a1', 'a2', 'a3']
-		>>> b = ['b0', 'b1', 'b2', 'b3']
-		>>>
-		>>> for c in MITMConstraints.ForwardDiff_LinearLayer(M, a, b): print(c)
-		...
-		3 b0 -  a0 - a2 - a3 >= 0
-		a0 + a2 + a3 - b0 >= 0
-		1 b1 -  a0 >= 0
-		a0 - b1 >= 0
-		2 b2 -  a1 - a2 >= 0
-		a1 + a2 - b2 >= 0
-		2 b3 -  a0 - a2 >= 0
-		a0 + a2 - b3 >= 0
-		>>>
-		"""
-		assert len(M[0]) == len(V_in), "The input is not compatible with the matrix"
-		assert len(M) == len(V_out), "The output is not compatible with the matrix"
-
-
+		assert len(M[0]) == len(V_in)
+		assert len(M) == len(V_out)
 		m = len(M)
 		n = len(M[0])
-
 		constr = []
 		for i in range(0, m):
 		    s = sum(M[i]) # the number of 1s in row i
 		    terms = [V_in[j] for j in range(0, n) if M[i][j] == 1]
 		    constr = constr + [str(s) + ' ' + V_out[i] + ' - ' + ' ' + BasicTools.MinusTerm(terms) + ' >= 0']
 		    constr = constr + [BasicTools.plusTerm(terms) + ' - ' + V_out[i] + ' >= 0']
-
 		return constr	
-
 	def McRelImprovementForward(inX,W):
-		#T = [("x3+y2'"),("x1+y0'"),("x3+y0'"),("x0+y3'"),("x2+y1'"),("x2'+y1"),("x0'+y3"),("y2'+y3"),("x1'+x3'+y0+y3'"),("y1+y2'"),("x3'+y1'+y2+y3'"),("y0'+y3")]
 		T=[("x1+y1'"),("x2'+y2'"),("x0+y0'"),("x3'+y3'"),("x2+x0'+y2"),("x3+x1'+y1"),("y2'+y0"),("y3+y1'"),("x3+x0'+y0"),("y3+y2+y0'"),("y3'+y1+y0"),("x3+y3+y0'")]
-		#T=[("x2+y3'"),("x0+y1'"),("x2+y1'"),("x1+y2'"),("x3+y0'"),("x3'+y0"),("x1'+y2"),("y2+y3'"),("x0'+x2'+y1+y2'"),("y0+y3'"),("x2'+y0'+y2'+y3"),("y1'+y2")]
 		eqn = []
-
 		for t in T:
 			cnt=0
 			eq=""
@@ -363,14 +265,10 @@ class Extension:
 				eq=eq+(" + " + W[0])
 			eq=eq + " >= " + str(-cnt+1)
 			eqn.append(eq)
-		return eqn
-		
+		return eqn		
 	def McRelImprovementBackward(inX,W):
-		#T = [("x3+y2'"),("x1+y0'"),("x3+y0'"),("x0+y3'"),("x2+y1'"),("x2'+y1"),("x0'+y3"),("y2'+y3"),("x1'+x3'+y0+y3'"),("y1+y2'"),("x3'+y1'+y2+y3'"),("y0'+y3")]
 		T=[("x1+y1'"),("x2'+y2'"),("x0+y0'"),("x3'+y3'"),("x2+x0'+y2"),("x3+x1'+y1"),("y2'+y0"),("y3+y1'"),("x3+x0'+y0"),("y3+y2+y0'"),("y3'+y1+y0"),("x3+y3+y0'")]
-		#T=[("x2+y3'"),("x0+y1'"),("x2+y1'"),("x1+y2'"),("x3+y0'"),("x3'+y0"),("x1'+y2"),("y2+y3'"),("x0'+x2'+y1+y2'"),("y0+y3'"),("x2'+y0'+y2'+y3"),("y1'+y2")]
 		eqn = []
-
 		for t in T:
 			cnt=0
 			eq=""
@@ -420,8 +318,7 @@ class Extension:
 				eq=eq+(" + " + W[0])
 			eq=eq + " >= " + str(-cnt+1)
 			eqn.append(eq)
-		return eqn
-			
+		return eqn			
 	def Determination_Decision(M, V_in, V_out , t_variable):
 		assert len(M[0]) == len(V_in)
 		assert len(M) == len(V_out)
@@ -439,10 +336,6 @@ class Extension:
 				terms1=[V_in[j] for j in range(0, n) if M[i][j] == 1]
 				constr = constr + [BasicTools.plusTerm(terms1) + ' - ' + str(s) + ' ' + V_out[i] + ' + ' + str(s) + ' ' + t_variable[i] + ' >= 0']
 		if True:
-			# for j in range(0, m):#This Forloop Is used to Prevent ai(input of mixcolumn matrix) from acting Unnecessarily
-			#      terms2=[V_out[i] for i in range(0, n) if M[i][j] == 1]
-			#      constr3 = constr3 + [Tools.plusTerm(terms2) + ' - ' + ' ' + V_in[j] + ' >= 0'] This Forloop Is not necessary because the Next One covers All Contraint That we Need In Our Model
-
 			for j in range(0, m):#This Forloop shows that if Ti variable are now active and we want to describe the constraints
 				s = sum(M[k][j] for k in range(0,len(M))) # the number of 1s in column j
 				terms1=[t_variable[i] for i in range(0, n) if M[i][j] == 1]
@@ -451,22 +344,6 @@ class Extension:
 		return constr
         	
 	def BackwardDet_LinearLayer(M, V_in, V_out):
-		"""
-		>>> M = [[1,0,1,1],[1,0,0,0],[0,1,1,0],[1,0,1,0]]
-		>>> a = ['a0', 'a1', 'a2', 'a3']
-		>>> b = ['b0', 'b1', 'b2', 'b3']
-		>>> MITMConstraints.BackwardDet_LinearLayer(M, a, b)
-		['3 a0 -  b0 - b1 - b3 >= 0',
-		 'b0 + b1 + b3 - a0 >= 0',
-		 '1 a1 -  b2 >= 0',
-		 'b2 - a1 >= 0',
-		 '3 a2 -  b0 - b2 - b3 >= 0',
-		 'b0 + b2 + b3 - a2 >= 0',
-		 '1 a3 -  b0 >= 0',
-		 'b0 - a3 >= 0']
-		>>>
-		>>>
-		"""
 		return Extension.ForwardDiff_LinearLayer(BasicTools.transpose(M), V_out, V_in)	
 	def genConstraints_backwardkeyrecovery(r): 
 		Input_PN_diff = BasicTools.VarGen("x_InPN",r)
@@ -495,8 +372,7 @@ class Extension:
 		Constr = Constr + BasicTools.greaterConstraints(Input_PN_val, Input_PN_diff)
 		Constr = Constr + BasicTools.greaterConstraints(Input_PN_val, Input_PN_h)
 		Constr = Constr + BasicTools.greaterConstraints_xyz(Input_PN_h,Input_PN_diff,Input_PN_val)		
-		return Constr		
-		
+		return Constr				
 	def genConstraints_backwardkeyrecoveryLastR(r): 
 		Input_round_diff = BasicTools.VarGen("x_InMC",r)
 		Input_PN_diff = BasicTools.VarGen("x_InPN",r)
@@ -509,8 +385,7 @@ class Extension:
 		for j in range(4):
 			#Constr = Constr + Extension.LinearLayer(CRAFT.Inv_MC, CRAFT.column(Input_PN_diff,j), CRAFT.column(Input_round_diff,j))		
 			Constr = Constr + Extension.McRelImprovementBackward(CRAFT.column(Input_PN_diff,j), CRAFT.column(Input_MC_McRel,j))
-		return Constr
-				
+		return Constr				
 	def genConstraints_forwardkeyrecovery(r): 
 		Input_round_diff = BasicTools.VarGen("x_InMC",r)
 		Input_PN_diff = BasicTools.VarGen("x_InPN",r)
@@ -521,8 +396,7 @@ class Extension:
 		Input_round_h = BasicTools.VarGen("h_InMC",r)
 		Input_PN_h = BasicTools.VarGen("h_InPN",r)
 		Output_round_h = BasicTools.VarGen("h_InMC",r+1)
-		DeterminationVar = BasicTools.VarGen("t",r)
-	     
+		DeterminationVar = BasicTools.VarGen("t",r)	     
 		Constr = []
 		#for j in range(4):
 		#	Constr = Constr + Extension.LinearLayer(CRAFT.MC, CRAFT.column(Input_round_diff,j), CRAFT.column(Input_PN_diff,j))
@@ -543,16 +417,13 @@ class Extension:
 		Input_round_val = BasicTools.VarGen("y_InMC",r)
 		Input_PN_val = BasicTools.VarGen("y_InPN",r)
 		Output_round_val = BasicTools.VarGen("y_InMC",r+1)
-		Output_MC_McRel = BasicTools.VarGen("w",r+1)
-	     
+		Output_MC_McRel = BasicTools.VarGen("w",r+1)	     
 		Constr = []
 		for j in range(4):
 			#Constr = Constr + Extension.LinearLayer(CRAFT.MC, CRAFT.column(Input_round_diff,j), CRAFT.column(Input_PN_diff,j))	
 			Constr = Constr + Extension.McRelImprovementForward(CRAFT.column(Input_round_diff,j), CRAFT.column(Output_MC_McRel,j))		
-		return Constr		
-        	    		    
+		return Constr		        	    		    
 if __name__ == '__main__':
-	print("HI")
 	const=[]
 	fileobj = open(filename_model, "w")	
 	#----------------------------------------2
@@ -828,8 +699,6 @@ if __name__ == '__main__':
 	
 	
 	m = read(filename_model)
-	m.Params.threads=192
-	#m.Params.PoolSolutions=2000000000
 	m.optimize()
 	#print("m.solcount=*************")
 	#print(m.solcount)	
